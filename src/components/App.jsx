@@ -1,11 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Container from './Container/Container';
 import ContactForm from './ContactForm/ContactForm';
 import ContactList from './ContactList/ContactList';
 import Filter from './Filter/Filter';
 import {
-  contactLoading,
   contactAdd,
   contactDelete,
   changeFilter,
@@ -15,45 +14,36 @@ import {
   getFilter,
   getVisibleContacts,
 } from 'redux/phonebook/phonebook-selectors';
+import { fetchContacts } from 'redux/phonebook/phonebook-operation';
+import * as API from 'services/API';
 
 export default function App() {
   const contacts = useSelector(getContacts);
   const filter = useSelector(getFilter);
   const visibleContacts = useSelector(getVisibleContacts);
   const dispatch = useDispatch();
-  const firstRender = useRef(true);
 
   useEffect(() => {
-    const getContacts = localStorage.getItem('contacts');
-    const parsedContacts = JSON.parse(getContacts);
-
-    if (parsedContacts) {
-      dispatch(contactLoading(parsedContacts));
-    }
+    dispatch(fetchContacts());
   }, []);
-
-  useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
-
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
 
   const checkDuplicateName = name =>
     contacts.find(contact => contact.name === name);
 
-  const formSubmitHandler = (name, number) => {
+  const formSubmitHandler = async (name, number) => {
     if (checkDuplicateName(name))
       return alert(
         'This contact already exists, please enter a different name',
       );
 
-    dispatch(contactAdd(name, number));
+    const contact = await API.postContact({ name, number });
+
+    dispatch(contactAdd(contact));
   };
 
   const onDelete = id => {
+    API.deleteContact(id);
+
     const filtredContacts = contacts.filter(contact => contact.id !== id);
 
     dispatch(contactDelete(filtredContacts));
