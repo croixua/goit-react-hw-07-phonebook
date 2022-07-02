@@ -1,14 +1,11 @@
 const BASE_URL = 'https://62bff53ec134cf51cec6b89e.mockapi.io/contacts';
 
-export const fetchContacts = async () => {
-  const res = await fetch(BASE_URL);
-  const data = await res.json();
-
-  if (!data || data.length === 0)
-    return Promise.reject(new Error('Not found contacts'));
-
-  return data;
+const fetchData = async (url = '', options = {}) => {
+  const res = await fetch(url, options);
+  return res.json();
 };
+
+export const fetchContacts = async () => fetchData(BASE_URL);
 
 export const postContact = async obj => {
   const options = {
@@ -18,13 +15,11 @@ export const postContact = async obj => {
       'Content-Type': 'application/json; charset=UTF-8',
     },
   };
-
-  const res = await fetch(BASE_URL, options);
-  const contact = res.json();
-
-  return contact;
+  return fetchData(BASE_URL, options);
 };
 
-export const deleteContact = id => {
-  return fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
+export const deleteContact = async id => {
+  const options = { method: 'DELETE' };
+
+  return await fetchData(`${BASE_URL}/${id}`, options);
 };

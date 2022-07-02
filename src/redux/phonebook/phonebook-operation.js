@@ -13,3 +13,29 @@ export const fetchContacts = createAsyncThunk(
     }
   },
 );
+
+export const postContact = createAsyncThunk(
+  'contacts/postContacts',
+  async (state, { rejectWithValue }) => {
+    try {
+      const contact = await API.postContact(state);
+
+      return contact;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
+
+export const deleteContact = createAsyncThunk(
+  'contacts/deleteContacts',
+  async (state, { rejectWithValue }) => {
+    try {
+      const contact = await API.deleteContact(state);
+
+      return contact;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);

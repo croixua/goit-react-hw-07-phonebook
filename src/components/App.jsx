@@ -1,26 +1,21 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { changeFilter } from 'redux/phonebook/phonebook-actions.js';
+import * as selectors from 'redux/phonebook/phonebook-selectors';
+import {
+  fetchContacts,
+  postContact,
+  deleteContact,
+} from 'redux/phonebook/phonebook-operation';
 import Container from './Container/Container';
 import ContactForm from './ContactForm/ContactForm';
 import ContactList from './ContactList/ContactList';
 import Filter from './Filter/Filter';
-import {
-  contactAdd,
-  contactDelete,
-  changeFilter,
-} from 'redux/phonebook/phonebook-actions.js';
-import {
-  getContacts,
-  getFilter,
-  getVisibleContacts,
-} from 'redux/phonebook/phonebook-selectors';
-import { fetchContacts } from 'redux/phonebook/phonebook-operation';
-import * as API from 'services/API';
 
 export default function App() {
-  const contacts = useSelector(getContacts);
-  const filter = useSelector(getFilter);
-  const visibleContacts = useSelector(getVisibleContacts);
+  const contacts = useSelector(selectors.getContacts);
+  const filter = useSelector(selectors.getFilter);
+  const visibleContacts = useSelector(selectors.getVisibleContacts);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -36,17 +31,11 @@ export default function App() {
         'This contact already exists, please enter a different name',
       );
 
-    const contact = await API.postContact({ name, number });
-
-    dispatch(contactAdd(contact));
+    dispatch(postContact({ name, number }));
   };
 
   const onDelete = id => {
-    API.deleteContact(id);
-
-    const filtredContacts = contacts.filter(contact => contact.id !== id);
-
-    dispatch(contactDelete(filtredContacts));
+    dispatch(deleteContact(id));
   };
 
   return (
@@ -59,7 +48,11 @@ export default function App() {
         handlerFilter={e => dispatch(changeFilter(e.currentTarget.value))}
         filter={filter}
       />
-      <ContactList contacts={visibleContacts} onDelete={onDelete} />
+      {contacts.length > 0 ? (
+        <ContactList contacts={visibleContacts} onDelete={onDelete} />
+      ) : (
+        <h1>not found contacs</h1>
+      )}
     </Container>
   );
 }
