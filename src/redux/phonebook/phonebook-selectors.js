@@ -10,3 +10,8 @@ export const getVisibleContacts = state => {
     contact.name.toLowerCase().includes(normalizedFilter),
   );
 };
+
+export const getFiltredContacts = (state, payload) =>
+  state.filter(({ id }) => {
+    return id !== payload.id;
+  });

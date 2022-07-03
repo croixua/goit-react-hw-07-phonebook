@@ -6,17 +6,13 @@ import {
   postContact,
   deleteContact,
 } from './phonebook-operation';
-
-const filtredContacts = (state, payload) =>
-  state.filter(({ id }) => {
-    return id !== payload.id;
-  });
+import { getFiltredContacts } from './phonebook-selectors';
 
 const items = createReducer([], {
   [fetchContacts.fulfilled]: (state, { payload }) => [...state, ...payload],
   [postContact.fulfilled]: (state, { payload }) => [...state, payload],
   [deleteContact.fulfilled]: (state, { payload }) =>
-    filtredContacts(state, payload),
+    getFiltredContacts(state, payload),
 });
 
 const filter = createReducer('', {
